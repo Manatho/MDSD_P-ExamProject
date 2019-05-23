@@ -1,0 +1,113 @@
+grammar org.xtext.mdsd_individual.ard.Ardlers with org.eclipse.xtext.common.Terminals
+
+generate ardlers "http://www.xtext.org/mdsd_individual/ard/Ardlers"
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
+Program: (board=Library?  program+= (Rule | Node)*) | definitions+= BoardDefinition*;
+
+Library:
+	'board' boardtype = [BoardDefinition]
+;
+
+BoardDefinition:
+	'define' 'board' name=ID 
+	('din:' di+= INT (',' di+= INT)*) & 
+	('dout:' do+= INT (',' do+= INT)*) & 
+	('ain:' ain+= INT (',' ain+=INT)*) & 
+	('aout:' aout+=INT (',' aout+=INT)*)
+;
+
+Rule:
+    type=('when' | 'once') condition=Condition '{' body=RuleBody '}'
+;
+
+Condition:
+    left=Exp operator=BOOLEAN_OPERATOR right=Exp;
+
+Exp returns Expression:
+    Factor ({Exp.left=current} operator=ExpWeakOp right=Factor)*
+;
+
+Factor returns Expression:
+    Value ({Factor.left=current} operator=ExpStrongOp right=Value)*
+;
+
+ExpWeakOp returns Operator:
+    operator = ('+' | '-')    
+;
+
+ExpStrongOp returns Operator:
+    operator = ('*' | '/')
+;
+
+terminal BOOLEAN_OPERATOR:
+    '<' | '>' | '>=' | '<=' | '==' | '!='
+;
+
+Value:
+     NumberLiteral | Attribute | Delta
+;
+
+Attribute:
+    name=[Node]  component=[Component]
+;
+
+Delta:
+    attr=Attribute 'delta'
+;
+
+NumberLiteral:
+	float=DECIMAL | int=INT
+;
+
+terminal DECIMAL: INT '.' INT;
+
+NUMBER returns ecore::EFloat: INT ('.' INT)?;
+
+State:
+    value=('on' | 'off')
+;
+
+RuleBody:
+    assignment+= Assignment+
+;
+
+Assignment:
+    attribute=Attribute "=" value=(Exp | State)
+;
+
+Node:
+    name=ID '{' components+=Component+ '}'
+;
+
+Component:
+    name=ID properties=ComponentBody
+;
+
+ComponentBody:
+    io=IO type=TYPE 'pin' pin=INT rate=Rate? map=Map? smoothing=Smoothing?
+;
+
+enum IO:
+    INPUT='input' | OUTPUT='output'
+;
+
+enum TYPE:
+    ANALOG='analog' | DIGITAL='digital'
+;
+
+Map:
+    'map' in=Range '=>' out=Range
+;
+
+Range:
+    low=NUMBER ':' high=NUMBER
+;
+
+Rate:
+    'rate' value=INT
+;
+
+Smoothing:
+    'smoothing' value=NUMBER
+;

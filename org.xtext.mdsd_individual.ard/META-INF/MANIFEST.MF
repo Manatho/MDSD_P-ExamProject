@@ -1,0 +1,30 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: org.xtext.mdsd_individual.ard
+Bundle-ManifestVersion: 2
+Bundle-Name: org.xtext.mdsd_individual.ard
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: org.xtext.mdsd_individual.ard; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.xtext,
+ org.eclipse.xtext.xbase,
+ org.eclipse.equinox.common;bundle-version="3.5.0",
+ org.eclipse.emf.ecore,
+ org.eclipse.xtext.xbase.lib;bundle-version="2.14.0",
+ org.eclipse.xtext.util,
+ org.eclipse.emf.common,
+ org.eclipse.xtend.lib;bundle-version="2.14.0",
+ org.antlr.runtime;bundle-version="[3.2.0,3.2.1)"
+Bundle-RequiredExecutionEnvironment: JavaSE-9
+Export-Package: org.xtext.mdsd_individual.ard.parser.antlr,
+ org.xtext.mdsd_individual.ard.parser.antlr.internal,
+ org.xtext.mdsd_individual.ard.generator,
+ org.xtext.mdsd_individual.ard.ardlers,
+ org.xtext.mdsd_individual.ard.ardlers.impl,
+ org.xtext.mdsd_individual.ard.services,
+ org.xtext.mdsd_individual.ard.validation,
+ org.xtext.mdsd_individual.ard.scoping,
+ org.xtext.mdsd_individual.ard,
+ org.xtext.mdsd_individual.ard.ardlers.util,
+ org.xtext.mdsd_individual.ard.serializer
+Import-Package: org.apache.log4j

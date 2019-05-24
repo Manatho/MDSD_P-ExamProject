@@ -10,7 +10,7 @@ SensorImport:
 ;
 
 Library:
-	'board' boardtype = [BoardDefinition]
+	'default' 'board' boardtype = [BoardDefinition]
 ;
 
 BoardDefinition:
@@ -22,45 +22,31 @@ BoardDefinition:
 ;
 
 Rule:
-    type=('when' | 'once') condition=Or '{' body=RuleBody '}'
+    type= 'when' condition=Or '{' body=RuleBody '}'
 ;
 
 Or:
-	And ({Or.left=current} operator=Orop right=And)*
+	And ({Or.left=current} operator='||' right=And)*
 ;
 
 And returns Expression:
-	Comparison ({And.left=current} operator=Andop right=Comparison)*
+	Comparison ({And.left=current} operator='&&' right=Comparison)*
 ;
 
 Comparison returns Expression:
-	Exp ({Comparison.left=current} operator=EquallityOp right=Exp)*
+	Exp ({Comparison.left=current} operator=('<' | '>' | '>=' | '<=' | '==' | '!=') right=Exp)*
 ;
 
 Exp returns Expression:
-	Factor ({Exp.left=current} operator=PlusMinusOp  right=Factor)*
+	Factor ({Exp.left=current} operator=('+' | '-')  right=Factor)*
 ;
 
 Factor returns Expression:
-    Value ({Factor.left=current} operator=MultiplicationDivideOp right=Value)*
+    Parenthesis ({Factor.left=current} operator=('*' | '/')  right=Parenthesis)*
 ;
 
-PlusMinusOp:
-	('+' | '-')
-;
-
-MultiplicationDivideOp:
-	('*' | '/') 
-;
-
-EquallityOp:
-	('<' | '>' | '>=' | '<=' | '==' | '!=')
-;
-Andop:
-	"&&"
-;
-Orop:
-	"||"
+Parenthesis:
+	'(' sub=Or ')' | Value
 ;
 
 
@@ -97,7 +83,7 @@ Assignment:
 ;
 
 Node:
-    name=ID '{' components+=Component+ '}'
+    name=ID (':' boardType=[BoardDefinition])? '{' components+=Component+ '}'
 ;
 
 Component:

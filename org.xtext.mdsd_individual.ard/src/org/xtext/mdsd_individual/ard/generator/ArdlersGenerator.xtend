@@ -25,6 +25,7 @@ import org.xtext.mdsd_individual.ard.ardlers.IO
 import org.xtext.mdsd_individual.ard.ardlers.TYPE
 import org.xtext.mdsd_individual.ard.ardlers.Or
 import org.xtext.mdsd_individual.ard.ardlers.And
+import org.xtext.mdsd_individual.ard.ardlers.Parenthesis
 
 class ArdlersGenerator extends AbstractGenerator  {
 	
@@ -96,6 +97,11 @@ class ArdlersGenerator extends AbstractGenerator  {
 			Delta: {
 				var variableName = x.attr.component.name +componentIDs.get(x.attr.name.name + x.attr.component.name) + "Value"
 				sb.append(variableName)
+			}
+			Parenthesis: {
+				sb.append("(")
+				generateExpressionString(x.sub, sb)
+				sb.append(")")
 			}
 			Or: {
 				generateExpressionString(x.left,sb )

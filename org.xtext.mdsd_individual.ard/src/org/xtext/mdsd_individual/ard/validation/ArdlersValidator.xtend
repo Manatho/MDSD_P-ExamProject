@@ -54,11 +54,16 @@ class ArdlersValidator extends AbstractArdlersValidator {
 	
 	@Check
 	def void checkPinIsOnBoard(ComponentBody body){
+		var boardType = body.eContainer.eContainer.eContents.filter(Node).get(0).boardType;
+		if(boardType === null){
+			val libraryList = body.eContainer.eContainer.eContainer.eContents.filter(Library);
+			if(libraryList.length > 0){
+				boardType = libraryList.get(0).boardtype;
+			}		
+		}
 		
-		val libraryList =  body.eContainer.eContainer.eContainer.eContents.filter(Library);
-		if(libraryList.length > 0){
-			val library = libraryList.get(0);
-			if(!library.boardtype.isPinPresent(body.pin, body.io, body.type)){
+		if(boardType !== null){
+			if(!boardType.isPinPresent(body.pin, body.io, body.type)){
 				error('Pin is not present on the board defined!', ArdlersPackage.eINSTANCE.componentBody_Pin)
 			}			
 		}

@@ -44,6 +44,9 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Or/right"/>
     </genClasses>
     <genClasses ecoreClass="Ardlers.ecore#//Expression"/>
+    <genClasses ecoreClass="Ardlers.ecore#//Parenthesis">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Parenthesis/sub"/>
+    </genClasses>
     <genClasses ecoreClass="Ardlers.ecore#//Value"/>
     <genClasses ecoreClass="Ardlers.ecore#//Attribute">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Attribute/name"/>
@@ -68,6 +71,7 @@
     </genClasses>
     <genClasses ecoreClass="Ardlers.ecore#//Node">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ardlers.ecore#//Node/name"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Node/boardType"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Node/components"/>
     </genClasses>
     <genClasses ecoreClass="Ardlers.ecore#//Component">

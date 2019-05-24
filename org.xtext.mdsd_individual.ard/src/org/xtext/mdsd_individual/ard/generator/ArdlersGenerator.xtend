@@ -12,19 +12,19 @@ import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
 import org.xtext.mdsd_individual.ard.ardlers.Assignment
 import org.xtext.mdsd_individual.ard.ardlers.Attribute
-import org.xtext.mdsd_individual.ard.ardlers.Condition
 import org.xtext.mdsd_individual.ard.ardlers.Delta
 import org.xtext.mdsd_individual.ard.ardlers.Exp
 import org.xtext.mdsd_individual.ard.ardlers.Expression
 import org.xtext.mdsd_individual.ard.ardlers.Factor
 import org.xtext.mdsd_individual.ard.ardlers.Node
 import org.xtext.mdsd_individual.ard.ardlers.NumberLiteral
-import org.xtext.mdsd_individual.ard.ardlers.Operator
 import org.xtext.mdsd_individual.ard.ardlers.Rule
 import org.xtext.mdsd_individual.ard.ardlers.State
 import org.xtext.mdsd_individual.ard.ardlers.SensorImport
 import org.xtext.mdsd_individual.ard.ardlers.IO
 import org.xtext.mdsd_individual.ard.ardlers.TYPE
+import org.xtext.mdsd_individual.ard.ardlers.Or
+import org.xtext.mdsd_individual.ard.ardlers.And
 
 class ArdlersGenerator extends AbstractGenerator  {
 	
@@ -59,7 +59,7 @@ class ArdlersGenerator extends AbstractGenerator  {
 		input.allContents.filter(SensorImport).forEach[createHeaderAndCPP(it, input, fsa)];
 	}
 	
-	def String generateExpressions(Expression exp) {
+	def String generateExpressions(Or exp) {
 		val sb = new StringBuilder()
 		generateExpressionString(exp, sb)
 		return sb.toString();
@@ -69,16 +69,18 @@ class ArdlersGenerator extends AbstractGenerator  {
 		switch x {
 			Exp: {
 				generateExpressionString(x.left, sb)
-				generateExpressionString(x.operator, sb)
+				sb.append(" " + x.operator + " ")
 				generateExpressionString(x.right, sb)
 			}
 			Factor:{
 				generateExpressionString(x.left,sb )
-				generateExpressionString(x.operator, sb)
+				sb.append(" " + x.operator + " ")
 				generateExpressionString(x.right, sb)
 			}
-			Operator: {
-				 sb.append(" " + x.operator + " ")
+			And:{
+				generateExpressionString(x.left,sb )
+				sb.append(" " + x.operator + " ")
+				generateExpressionString(x.right, sb)
 			}
 			NumberLiteral: {
 				if (x.float !== null) {
@@ -95,10 +97,15 @@ class ArdlersGenerator extends AbstractGenerator  {
 				var variableName = x.attr.component.name +componentIDs.get(x.attr.name.name + x.attr.component.name) + "Value"
 				sb.append(variableName)
 			}
+			Or: {
+				generateExpressionString(x.left,sb )
+				sb.append(" " + x.operator + " ")
+				generateExpressionString(x.right, sb)
+			}
 		}
 	}
 	
-	def Attribute[] getAttributes(Condition condition){
+	def Attribute[] getAttributes(Or condition){
 		
 		val attributes = new ArrayList<Attribute>()
 		
@@ -118,12 +125,21 @@ class ArdlersGenerator extends AbstractGenerator  {
 				getAttributeRecursive(x.left, list)
 				getAttributeRecursive(x.right, list)
 			}
+			And: {
+				getAttributeRecursive(x.left, list)
+				getAttributeRecursive(x.right, list)
+			}
 			Attribute: {
 				list.add(x)
 			}
 			Delta: {
 				list.add(x.attr)
 			}
+			Or: {
+				getAttributeRecursive(x.left, list)
+				getAttributeRecursive(x.right, list)
+			}
+
 			default: {
 				// do nathing
 			}

@@ -38,15 +38,12 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Rule/condition"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Rule/body"/>
     </genClasses>
-    <genClasses ecoreClass="Ardlers.ecore#//Condition">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Condition/left"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ardlers.ecore#//Condition/operator"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Condition/right"/>
+    <genClasses ecoreClass="Ardlers.ecore#//Or">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Or/left"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ardlers.ecore#//Or/operator"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Or/right"/>
     </genClasses>
     <genClasses ecoreClass="Ardlers.ecore#//Expression"/>
-    <genClasses ecoreClass="Ardlers.ecore#//Operator">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ardlers.ecore#//Operator/operator"/>
-    </genClasses>
     <genClasses ecoreClass="Ardlers.ecore#//Value"/>
     <genClasses ecoreClass="Ardlers.ecore#//Attribute">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Attribute/name"/>
@@ -100,20 +97,9 @@
     <genClasses ecoreClass="Ardlers.ecore#//Smoothing">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ardlers.ecore#//Smoothing/value"/>
     </genClasses>
-    <genClasses ecoreClass="Ardlers.ecore#//Exp">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Exp/left"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Exp/operator"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Exp/right"/>
-    </genClasses>
-    <genClasses ecoreClass="Ardlers.ecore#//Factor">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Factor/left"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Factor/operator"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Factor/right"/>
-    </genClasses>
-    <genClasses ecoreClass="Ardlers.ecore#//Boolor">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Boolor/left"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Boolor/operator"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Boolor/right"/>
-    </genClasses>
+    <genClasses ecoreClass="Ardlers.ecore#//And"/>
+    <genClasses ecoreClass="Ardlers.ecore#//Comparison"/>
+    <genClasses ecoreClass="Ardlers.ecore#//Exp"/>
+    <genClasses ecoreClass="Ardlers.ecore#//Factor"/>
   </genPackages>
 </genmodel:GenModel>

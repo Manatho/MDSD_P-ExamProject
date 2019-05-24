@@ -22,31 +22,47 @@ BoardDefinition:
 ;
 
 Rule:
-    type=('when' | 'once') condition=Condition '{' body=RuleBody '}'
+    type=('when' | 'once') condition=Or '{' body=RuleBody '}'
 ;
 
-Condition:
-    left=Exp operator=BOOLEAN_OPERATOR right=Exp;
+Or:
+	And ({Or.left=current} operator=Orop right=And)*
+;
+
+And returns Expression:
+	Comparison ({And.left=current} operator=Andop right=Comparison)*
+;
+
+Comparison returns Expression:
+	Exp ({Comparison.left=current} operator=EquallityOp right=Exp)*
+;
 
 Exp returns Expression:
-    Factor ({Exp.left=current} operator=ExpWeakOp right=Factor)*
+	Factor ({Exp.left=current} operator=PlusMinusOp  right=Factor)*
 ;
 
 Factor returns Expression:
-    Value ({Factor.left=current} operator=ExpStrongOp right=Value)*
+    Value ({Factor.left=current} operator=MultiplicationDivideOp right=Value)*
 ;
 
-ExpWeakOp returns Operator:
-    operator = ('+' | '-')    
+PlusMinusOp:
+	('+' | '-')
 ;
 
-ExpStrongOp returns Operator:
-    operator = ('*' | '/')
+MultiplicationDivideOp:
+	('*' | '/') 
 ;
 
-terminal BOOLEAN_OPERATOR:
-    '<' | '>' | '>=' | '<=' | '==' | '!='
+EquallityOp:
+	('<' | '>' | '>=' | '<=' | '==' | '!=')
 ;
+Andop:
+	"&&"
+;
+Orop:
+	"||"
+;
+
 
 Value:
      NumberLiteral | Attribute | Delta

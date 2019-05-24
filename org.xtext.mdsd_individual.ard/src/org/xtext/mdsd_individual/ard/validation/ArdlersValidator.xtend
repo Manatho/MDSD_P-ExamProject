@@ -12,6 +12,8 @@ import org.xtext.mdsd_individual.ard.ardlers.Node
 import org.xtext.mdsd_individual.ard.ardlers.Library
 import org.xtext.mdsd_individual.ard.extensions.*
 import org.xtext.mdsd_individual.ard.ardlers.BoardDefinition
+import org.xtext.mdsd_individual.ard.ardlers.TYPE
+import org.xtext.mdsd_individual.ard.ardlers.IO
 
 /**
  * This class contains custom validation rules. 
@@ -33,14 +35,14 @@ class ArdlersValidator extends AbstractArdlersValidator {
 			val type = (component as Component).properties.type;
 			val pin = (component as Component).properties.pin;
 
-			if (type.equals('analog')) {
+			if (type == TYPE.ANALOG) {
 				if (analogPins.contains(type.literal + pin)) {
 					error("Pin is already in use", ArdlersPackage.eINSTANCE.componentBody_Pin)
 				} else {
 					analogPins.add(type.literal + pin)
 				}
 			}
-			if (type.equals('digital')) {
+			if (type == TYPE.DIGITAL) {
 				if (digitalPins.contains(type.literal + pin)) {
 					error("Pin is already in use", ArdlersPackage.eINSTANCE.componentBody_Pin)
 				} else {
@@ -80,7 +82,7 @@ class ArdlersValidator extends AbstractArdlersValidator {
 	
 	@Check
 	def void checkRateOnInputComponents(ComponentBody body) {
-		if(body.io == "input" && body.rate === null) {
+		if(body.io == IO.INPUT && body.rate === null) {
 			error("Rate is required on input components", ArdlersPackage.eINSTANCE.componentBody_Rate)
 		}
 	}

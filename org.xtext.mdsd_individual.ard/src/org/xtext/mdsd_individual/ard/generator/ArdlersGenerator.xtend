@@ -22,6 +22,9 @@ import org.xtext.mdsd_individual.ard.ardlers.NumberLiteral
 import org.xtext.mdsd_individual.ard.ardlers.Operator
 import org.xtext.mdsd_individual.ard.ardlers.Rule
 import org.xtext.mdsd_individual.ard.ardlers.State
+import org.xtext.mdsd_individual.ard.ardlers.SensorImport
+import org.xtext.mdsd_individual.ard.ardlers.IO
+import org.xtext.mdsd_individual.ard.ardlers.TYPE
 
 class ArdlersGenerator extends AbstractGenerator  {
 	
@@ -53,6 +56,7 @@ class ArdlersGenerator extends AbstractGenerator  {
 		}
 		fsa.generateFile("ids.txt", nodeRadioIDs.toString + "\n" + componentIDs.toString());
 		input.allContents.filter(Node).forEach[createFileAndClean(it, input, fsa)];
+		input.allContents.filter(SensorImport).forEach[createHeaderAndCPP(it, input, fsa)];
 	}
 	
 	def String generateExpressions(Expression exp) {
@@ -161,7 +165,62 @@ class ArdlersGenerator extends AbstractGenerator  {
 		fsa.generateFile(node.name + ".ino", generateNodeFile(node, input, fsa))
 		this.componentValueNameSet.clear
 		this.componentValueNameUpdateSet.clear
+	}
+	
+	def createHeaderAndCPP(SensorImport sensor, Resource input, IFileSystemAccess2 fsa) {
+		fsa.generateFile("templates/" + sensor.name + "TEMPLATE.h", generateHeader(sensor, input, fsa ))
+		fsa.generateFile("templates/" + sensor.name + "TEMPLATE.cpp", generateCPP(sensor, input, fsa ))
+	}
+	
+	def CharSequence generateHeader(SensorImport sensor, Resource input, IFileSystemAccess2 fsa) {'''
+		/*
+			TEMPLATE FILE: Copy, remove 'TEMPLATE' from the name and move to root, change as needed
+			Header file for «sensor.name»
+		*/
 		
+		#ifndef «sensor.name»_h //Used to prevent problems with duplicate includes
+		#define «sensor.name»_h
+		
+		#include <Arduino.h>
+		
+		class «sensor.name» //Do NOT change!
+		{
+		    public:
+		    	«sensor.name»();  //Do NOT change!
+		    	float read(); // Do NOT change!
+		    	void write(float value);
+		    //private: // Add private fields if needed
+		    	
+		};
+		
+		#endif
+		'''
+	}
+	
+	def CharSequence generateCPP(SensorImport sensor, Resource input, IFileSystemAccess2 fsa) {
+		'''
+			/*
+				TEMPLATE FILE: Copy, remove 'TEMPLATE' from the name and move to root, change as needed
+				CPP file for «sensor.name»
+			*/
+			
+			#include <Arduino.h>
+			#include "«sensor.name».h"
+			
+			«sensor.name»::«sensor.name»(){
+				//Add your initialization code here
+			}
+			 
+			float «sensor.name»::read(){
+				//Add your code here
+			}
+			
+			void «sensor.name»::write(float value){
+				//Add your code here
+				return 0;
+			}
+		'''
+		//throw new UnsupportedOperationException("TODO: auto-generated method stub")
 	}
 	
 	def CharSequence generateNodeFile(Node node, Resource input, IFileSystemAccess2 fsa) '''
@@ -170,6 +229,11 @@ class ArdlersGenerator extends AbstractGenerator  {
 	#include <SPI.h>
 	#include <RF24Network.h>
 	#include <RF24.h>
+	«FOR component : node.components»
+		«IF component.sensor !== null»
+			#include "«component.sensor.name».h"
+		«ENDIF»
+	«ENDFOR»
 	
 	typedef union {
 	    unsigned char byteval[4];
@@ -205,12 +269,16 @@ class ArdlersGenerator extends AbstractGenerator  {
 	
 	//local outputComponents
 	«FOR component : node.components»
-	int «component.name»Pin = «IF component.properties.type.equals('analog')»A«ENDIF»«component.properties.pin»;
-	«IF component.properties.io == "input"»
-		const long «component.name»Rate = «component.properties.rate?.value»;
-		long «component.name»LastTransfer = 0;
-	«ENDIF»
-	
+		«IF component.sensor === null»
+			int «component.name»Pin = «IF component.properties.type == TYPE.ANALOG»A«ENDIF»«component.properties.pin»;
+		«ELSE»
+			«component.sensor.name» «component.sensor.name»Instance;
+		«ENDIF»
+		«IF component.properties.io == IO.INPUT»
+			const long «component.name»Rate = «component.properties.rate?.value»;
+			long «component.name»LastTransfer = 0;
+		«ENDIF»
+		
 	«ENDFOR»
 	
 	//Incoming components
@@ -232,7 +300,7 @@ class ArdlersGenerator extends AbstractGenerator  {
 		//Radio
 		radio.begin();
 		network.begin(90, this_node);
-		«FOR component : node.components.filter[it.properties.type == "digital" || it.properties.io == "output"]»
+		«FOR component : node.components.filter[(it.properties.type == TYPE.DIGITAL || it.properties.io == IO.OUTPUT) && it.sensor === null]»
 			 pinMode(«component.name»Pin, «component.properties.io.literal.toUpperCase»);
 		«ENDFOR»
 	}
@@ -280,7 +348,11 @@ while (network.available()) {
 				«IF getAttributes(rule.condition).length > 0»if («generateAttributeComponentIdConditions(getAttributes(rule.condition))») {«ENDIF»
 					if («generateExpressions(rule.condition.left)» «rule.condition.operator» «generateExpressions(rule.condition.right)») {
 						«FOR myAssignment : rule.body.assignment.filter[it.attribute.name.name == node.name]»
-							«myAssignment.attribute.component.properties.type»Write(«myAssignment.attribute.component.name»Pin, «valueToString(myAssignment)»);
+							«IF myAssignment.attribute.component.sensor === null»
+								«myAssignment.attribute.component.properties.type»Write(«myAssignment.attribute.component.name»Pin, «valueToString(myAssignment)»);
+							«ELSE»
+								«myAssignment.attribute.component.sensor.name»Instance.write(«valueToString(myAssignment)»);
+							«ENDIF»
 						«ENDFOR»
 					}
 				«IF getAttributes(rule.condition).length > 0»}«ENDIF»
@@ -290,7 +362,7 @@ while (network.available()) {
 		}
 		«ENDIF»
 		//Sample and Transmit sensor data
-		«FOR component : node.components.filter[it.properties.io == "input"]»
+		«FOR component : node.components.filter[it.properties.io == IO.INPUT]»
 			if(millis() > «component.name»LastTransfer + «component.name»Rate){
 				char buff[6];
 				IntByte id;
@@ -299,9 +371,18 @@ while (network.available()) {
 				
 				FloatByte value;
 				«IF component.properties.map !== null»
-					value.floatval = mapfloat(«component.properties.type»Read(«component.name»Pin), «component.properties.map.in.low», «component.properties.map.in.high», «component.properties.map.out.low», «component.properties.map.out.high»);
+					«IF component.sensor === null»
+						value.floatval = mapfloat(«component.properties.type»Read(«component.name»Pin), «component.properties.map.in.low», «component.properties.map.in.high», «component.properties.map.out.low», «component.properties.map.out.high»);
+					«ELSE»
+						value.floatval = mapfloat(«component.sensor.name + 'Instance.read()'», «component.properties.map.in.low», «component.properties.map.in.high», «component.properties.map.out.low», «component.properties.map.out.high»);
+					«ENDIF»
 				«ELSE»
-					value.floatval = «component.properties.type»Read(«component.name»Pin);
+					«IF component.sensor === null»
+						value.floatval = «component.properties.type»Read(«component.name»Pin);
+					«ELSE»
+						value.floatval = «component.sensor.name + 'Instance.read()'»;
+					«ENDIF»
+					
 				«ENDIF»
 				writeBuffer(value, buff);
 				
@@ -312,7 +393,7 @@ while (network.available()) {
 							«IF !assignment.attribute.name.name.equals(node.name)»
 								forceSend(«nodeRadioIDs.get(assignment.attribute.name.name)», buff, sizeof(buff));
 							«ELSE»
-								«IF assignment.attribute.component.properties.type == "analog"»
+								«IF assignment.attribute.component.properties.type == TYPE.ANALOG»
 									analogWrite(«assignment.attribute.component.name»Pin, «valueToString(assignment)»);
 								«ELSE»
 									digitalWrite(«assignment.attribute.component.name»Pin, «valueToString(assignment)»);
@@ -354,6 +435,8 @@ while (network.available()) {
 			}
 		}
 	}
+	
+
 	
 
 	

@@ -16,8 +16,12 @@
     </genEnums>
     <genClasses ecoreClass="Ardlers.ecore#//Program">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Program/board"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Program/sensorsImports"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Program/program"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Program/definitions"/>
+    </genClasses>
+    <genClasses ecoreClass="Ardlers.ecore#//SensorImport">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ardlers.ecore#//SensorImport/name"/>
     </genClasses>
     <genClasses ecoreClass="Ardlers.ecore#//Library">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Library/boardtype"/>
@@ -71,15 +75,16 @@
     </genClasses>
     <genClasses ecoreClass="Ardlers.ecore#//Component">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ardlers.ecore#//Component/name"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Component/sensor"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Component/properties"/>
     </genClasses>
     <genClasses ecoreClass="Ardlers.ecore#//ComponentBody">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ardlers.ecore#//ComponentBody/io"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ardlers.ecore#//ComponentBody/type"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ardlers.ecore#//ComponentBody/pin"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//ComponentBody/rate"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//ComponentBody/map"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//ComponentBody/smoothing"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ardlers.ecore#//ComponentBody/type"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ardlers.ecore#//ComponentBody/pinned"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Ardlers.ecore#//ComponentBody/pin"/>
     </genClasses>
     <genClasses ecoreClass="Ardlers.ecore#//Map">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Map/in"/>
@@ -104,6 +109,11 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Factor/left"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Factor/operator"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Factor/right"/>
+    </genClasses>
+    <genClasses ecoreClass="Ardlers.ecore#//Boolor">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Boolor/left"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Boolor/operator"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Ardlers.ecore#//Boolor/right"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

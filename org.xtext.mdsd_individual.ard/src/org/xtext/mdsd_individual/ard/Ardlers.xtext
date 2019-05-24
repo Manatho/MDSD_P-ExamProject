@@ -3,7 +3,11 @@ grammar org.xtext.mdsd_individual.ard.Ardlers with org.eclipse.xtext.common.Term
 generate ardlers "http://www.xtext.org/mdsd_individual/ard/Ardlers"
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 
-Program: (board=Library?  program+= (Rule | Node)*) | definitions+= BoardDefinition*;
+Program: (board=Library? sensorsImports+=SensorImport*  program+= (Rule | Node)*) | definitions+= BoardDefinition+;
+
+SensorImport:
+	'sensor' name= ID
+;
 
 Library:
 	'board' boardtype = [BoardDefinition]
@@ -81,11 +85,15 @@ Node:
 ;
 
 Component:
-    name=ID properties=ComponentBody
+    name=ID (('using' sensor=[SensorImport] properties= PinlessComponentBody) | properties=ComponentBody)
+;
+
+PinlessComponentBody returns ComponentBody:
+    io=IO rate=Rate? map=Map?
 ;
 
 ComponentBody:
-    io=IO type=TYPE 'pin' pin=INT rate=Rate? map=Map? smoothing=Smoothing?
+    io=IO type=TYPE pinned='pin' pin=INT rate=Rate? map=Map?
 ;
 
 enum IO:
